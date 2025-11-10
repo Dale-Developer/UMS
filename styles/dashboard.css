@@ -1,0 +1,235 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  background-color: #e4e9f7;
+}
+.stats-container {
+  padding: 20px;
+  margin-left: 250px;
+  transition: all 0.3s ease;
+  
+}
+
+/* Main dashboard grid layout */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 25px;
+  align-items: start;
+}
+
+.stats-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 0;
+}
+
+/* Charts grid - now using the main grid layout */
+.charts-grid {
+  display: contents; /* Remove default grid and use parent grid */
+}
+
+.chart-card:first-child {
+  grid-column: 1;
+  grid-row: 2;
+  height: fit-content;
+  min-height: 400px; /* Aligns with stat cards height */
+}
+
+.chart-card:last-child {
+  grid-column: 2;
+  grid-row: 2;
+  height: fit-content;
+  min-height: 400px; /* Match height with first chart */
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: currentColor;
+  opacity: 0.1;
+  border-radius: 0 0 0 80px;
+}
+
+.stat-card.total {
+  border-left-color: #4361ee;
+  color: #4361ee;
+}
+
+.stat-card.active {
+  border-left-color: #06d6a0;
+  color: #06d6a0;
+}
+
+.stat-card.delete {
+  border-left-color: #ff6666;
+  color: #ff6666;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.stat-icon i {
+  font-size: 24px;
+  color: white;
+}
+
+.stat-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #707070;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 10px 5px;
+}
+
+.stat-subtext {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.chart-actions select {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+}
+
+.chart-placeholder {
+  height: 300px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Page Header */
+.page-header {
+  padding: 20px;
+  margin-left: 250px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card:first-child,
+  .chart-card:last-child {
+    grid-column: 1;
+  }
+  
+  .chart-card:last-child {
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-container {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .page-header {
+    margin-left: 0;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card:first-child,
+  .chart-card:last-child {
+    min-height: 350px;
+  }
+}
