@@ -7,12 +7,28 @@
 }
 body {
   background-color: #e4e9f7;
+  transition: all 0.3s ease;
 }
+
+/* Default state - Sidebar OPEN (250px) */
+.page-header {
+  padding: 20px;
+  margin-left: 250px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
 .stats-container {
   padding: 20px;
   margin-left: 250px;
   transition: all 0.3s ease;
-  
+}
+
+/* When sidebar is CLOSED (88px) */
+.sidebar.close ~ .page-header,
+.sidebar.close ~ .stats-container {
+  margin-left: 88px;
 }
 
 /* Main dashboard grid layout */
@@ -22,6 +38,13 @@ body {
   grid-template-rows: auto auto;
   gap: 25px;
   align-items: start;
+  transition: all 0.3s ease;
+}
+
+/* EXPAND grid layout when sidebar is closed */
+.sidebar.close ~ .stats-container .dashboard-layout {
+  grid-template-columns: 2.2fr 1fr;
+  gap: 30px;
 }
 
 .stats-grid {
@@ -30,25 +53,40 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 25px;
   margin-bottom: 0;
+  transition: all 0.3s ease;
 }
 
-/* Charts grid - now using the main grid layout */
+/* EXPAND stats grid when sidebar is closed */
+.sidebar.close ~ .stats-container .stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* Charts grid */
 .charts-grid {
-  display: contents; /* Remove default grid and use parent grid */
+  display: contents;
 }
 
 .chart-card:first-child {
   grid-column: 1;
   grid-row: 2;
   height: fit-content;
-  min-height: 400px; /* Aligns with stat cards height */
+  min-height: 400px;
+  transition: all 0.3s ease;
 }
 
 .chart-card:last-child {
   grid-column: 2;
   grid-row: 2;
   height: fit-content;
-  min-height: 400px; /* Match height with first chart */
+  min-height: 400px;
+  transition: all 0.3s ease;
+}
+
+/* EXPAND chart cards when sidebar is closed */
+.sidebar.close ~ .stats-container .chart-card:first-child,
+.sidebar.close ~ .stats-container .chart-card:last-child {
+  min-height: 420px;
 }
 
 .stat-card {
@@ -130,6 +168,12 @@ body {
   font-weight: 700;
   color: #333;
   margin: 10px 5px;
+  transition: all 0.3s ease;
+}
+
+/* Larger text when expanded */
+.sidebar.close ~ .stats-container .stat-value {
+  font-size: 34px;
 }
 
 .stat-subtext {
@@ -181,14 +225,12 @@ body {
   justify-content: center;
   color: #666;
   font-size: 16px;
+  transition: all 0.3s ease;
 }
 
-/* Page Header */
-.page-header {
-  padding: 20px;
-  margin-left: 250px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+/* Taller charts when expanded */
+.sidebar.close ~ .stats-container .chart-placeholder {
+  height: 320px;
 }
 
 .page-title {
@@ -196,6 +238,44 @@ body {
   font-weight: 600;
   color: #333;
   margin: 0;
+}
+
+/* Mobile Header */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 20px;
+  align-items: center;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: #f5f5f5;
+}
+
+.mobile-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-left: 15px;
 }
 
 /* Responsive Design */
@@ -215,13 +295,27 @@ body {
 }
 
 @media (max-width: 768px) {
-  .stats-container {
-    margin-left: 0;
-    padding: 15px;
+  .mobile-header {
+    display: flex;
   }
-
+  
+  .page-header,
+  .stats-container {
+    margin-left: 0 !important;
+  }
+  
+  .sidebar.close ~ .page-header,
+  .sidebar.close ~ .stats-container {
+    margin-left: 0 !important;
+  }
+  
+  .stats-container {
+    padding: 15px;
+    margin-top: 60px;
+  }
+  
   .page-header {
-    margin-left: 0;
+    display: none;
   }
 
   .stats-grid {

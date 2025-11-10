@@ -18,6 +18,12 @@ body {
   margin-left: 250px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+/* When sidebar is closed */
+.sidebar.close ~ .page-header {
+  margin-left: 88px;
 }
 
 .page-title {
@@ -34,12 +40,23 @@ body {
   transition: all 0.3s ease;
 }
 
+/* When sidebar is closed - EXPAND CONTENT */
+.sidebar.close ~ .content-container {
+  margin-left: 88px;
+}
+
 /* CRUD Buttons */
 .crud-buttons {
   display: flex;
   gap: 15px;
   margin-bottom: 25px;
   flex-wrap: wrap;
+  transition: all 0.3s ease;
+}
+
+/* Expand button spacing when sidebar closed */
+.sidebar.close ~ .content-container .crud-buttons {
+  gap: 20px;
 }
 
 .btn {
@@ -104,6 +121,13 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow-x: auto;
   margin-bottom: 25px;
+  transition: all 0.3s ease;
+}
+
+/* Expand table container when sidebar closed */
+.sidebar.close ~ .content-container .table-container {
+  padding: 28px;
+  border-radius: 16px;
 }
 
 /* User Table */
@@ -111,6 +135,12 @@ body {
   width: 100%;
   border-collapse: collapse;
   min-width: 800px;
+  transition: all 0.3s ease;
+}
+
+/* Expand table when sidebar closed */
+.sidebar.close ~ .content-container .user-table {
+  min-width: 850px;
 }
 
 .user-table th {
@@ -123,6 +153,13 @@ body {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+/* Larger table headers when expanded */
+.sidebar.close ~ .content-container .user-table th {
+  padding: 16px 14px;
+  font-size: 15px;
 }
 
 .user-table td {
@@ -130,6 +167,13 @@ body {
   border-bottom: 1px solid #e9ecef;
   color: #555;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Larger table cells when expanded */
+.sidebar.close ~ .content-container .user-table td {
+  padding: 16px 14px;
+  font-size: 15px;
 }
 
 .user-table tbody tr {
@@ -160,6 +204,14 @@ body {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+/* Larger badges when expanded */
+.sidebar.close ~ .content-container .role,
+.sidebar.close ~ .content-container .status {
+  padding: 7px 14px;
+  font-size: 13px;
 }
 
 .role.admin {
@@ -191,6 +243,12 @@ body {
 .actions {
   display: flex;
   gap: 8px;
+  transition: all 0.3s ease;
+}
+
+/* More spacing for action buttons when expanded */
+.sidebar.close ~ .content-container .actions {
+  gap: 10px;
 }
 
 .btn-icon {
@@ -204,6 +262,13 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 16px;
+}
+
+/* Larger action buttons when expanded */
+.sidebar.close ~ .content-container .btn-icon {
+  width: 38px;
+  height: 38px;
+  font-size: 17px;
 }
 
 .btn-icon.view {
@@ -461,8 +526,9 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .content-container,
-  .page-header {
+  /* Remove sidebar adjustments on medium screens */
+  .sidebar.close ~ .content-container,
+  .sidebar.close ~ .page-header {
     margin-left: 88px;
   }
 }
@@ -470,8 +536,26 @@ body {
 @media (max-width: 768px) {
   .content-container,
   .page-header {
-    margin-left: 0;
+    margin-left: 0 !important;
     padding: 15px;
+  }
+
+  /* Reset all expansions on mobile */
+  .sidebar.close ~ .content-container,
+  .sidebar.close ~ .page-header {
+    margin-left: 0 !important;
+  }
+
+  .sidebar.close ~ .content-container .crud-buttons,
+  .sidebar.close ~ .content-container .table-container,
+  .sidebar.close ~ .content-container .user-table,
+  .sidebar.close ~ .content-container .user-table th,
+  .sidebar.close ~ .content-container .user-table td,
+  .sidebar.close ~ .content-container .role,
+  .sidebar.close ~ .content-container .status,
+  .sidebar.close ~ .content-container .actions,
+  .sidebar.close ~ .content-container .btn-icon {
+    all: revert;
   }
 
   .crud-buttons {
@@ -530,5 +614,16 @@ body {
 
   .detail-group span {
     text-align: left;
+  }
+}
+
+/* Large Desktop Screens - More expansion */
+@media (min-width: 1440px) {
+  .sidebar.close ~ .content-container .user-table {
+    min-width: 900px;
+  }
+  
+  .sidebar.close ~ .content-container .table-container {
+    padding: 30px;
   }
 }

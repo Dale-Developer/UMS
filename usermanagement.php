@@ -11,6 +11,8 @@
     <title>User Management</title>
   </head>
   <body>
+    <!-- SIDEBAR -->
+     <?php include 'sidebar.php'; ?>
     <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">User Management</h1>

@@ -32,15 +32,15 @@
           </a>
         </li>
         <li class="nav-link">
-          <a href="records.php">
-            <i class='bx bx-folder-open icon'></i>
-            <span class="text nav-text">Records</span>
+          <a href="usermanagement.php">
+            <i class='bx bxs-user-account icon'></i>
+            <span class="text nav-text">User Management</span>
           </a>
         </li>
         <li class="nav-link">
-          <a href="users.php">
-            <i class='bx bxs-user-account icon'></i>
-            <span class="text nav-text">User Management</span>
+          <a href="records.php">
+            <i class='bx bx-folder-open icon'></i>
+            <span class="text nav-text">Records</span>
           </a>
         </li>
         <li class="nav-link">
@@ -74,27 +74,33 @@
 
 <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 <script>
-  const body = document.querySelector("body"),
-    sidebar = body.querySelector("nav"),
-    toggle = body.querySelector(".toggle"),
-    searchBtn = body.querySelector(".search-box"),
-    modeSwitch = body.querySelector(".toggle-switch"),
-    modeText = body.querySelector(".mode-text");
-  
-  toggle.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-  });
-  
-  searchBtn.addEventListener("click", () => {
-    sidebar.classList.remove("close");
-  });
-  
-  modeSwitch.addEventListener("click", () => {
-    body.classList.toggle("dark");
-    if (body.classList.contains("dark")) {
-      modeText.innerText = "Light mode";
-    } else {
-      modeText.innerText = "Dark mode";
+  // Single, clean sidebar toggle script
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.toggle');
+    
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', function() {
+        sidebar.classList.toggle('close');
+        document.body.classList.toggle('sidebar-closed');
+        console.log('Sidebar toggled - close:', sidebar.classList.contains('close'));
+      });
+    }
+
+    // Keep your existing dark mode functionality
+    const body = document.querySelector("body"),
+          modeSwitch = body.querySelector(".toggle-switch"),
+          modeText = body.querySelector(".mode-text");
+
+    if (modeSwitch) {
+      modeSwitch.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        if (body.classList.contains("dark")) {
+          modeText.innerText = "Light mode";
+        } else {
+          modeText.innerText = "Dark mode";
+        }
+      });
     }
   });
 </script>

@@ -12,12 +12,13 @@
     <!-- <link rel="stylesheet" href="styles/sidebar.css"> -->
   </head>
   <body>
+    <!-- SIDEBAR -->
+    <?php include 'sidebar.php'; ?>
     
     <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">Dashboard</h1>
     </div>
-  <?php include 'sidebar.php'; ?>
     <!-- Dashboard Content -->
     <div class="stats-container">
       <div class="dashboard-layout">
