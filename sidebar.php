@@ -1,5 +1,27 @@
 <?php
 // sidebar.php - Reusable sidebar component
+
+session_start();
+include 'db_connect.php';
+
+// Ensure user is logged in
+if (!isset($_SESSION['email'])) {
+  header("Location: login.php");
+  exit();
+}
+
+// Fetch username & role from database using session email
+$email = $_SESSION['email'];
+$query = $conn->prepare("SELECT username, user_role FROM users WHERE email = ?");
+$query->bind_param("s", $email);
+$query->execute();
+$result = $query->get_result();
+$user = $result->fetch_assoc();
+
+$username = $user['username'] ?? 'Unknown User';
+$user_role = ucfirst($user['user_role'] ?? 'User'); // Capitalize role
+
+
 ?>
 <!-- SIDEBAR COMPONENT -->
 <link rel="stylesheet" href="styles/sidebar.css" />
@@ -12,8 +34,9 @@
         <box-icon type="solid" name="package"></box-icon>
       </span>
       <div class="text logo-text">
-        <span class="name">Codinglab</span>
-        <span class="profession">Web developer</span>
+        <span class="name"><?= htmlspecialchars($username) ?></span>
+        <span class="profession"><?= htmlspecialchars($user_role) ?></span>
+
       </div>
     </div>
     <i class="bx bx-chevron-right toggle"></i>
@@ -58,7 +81,7 @@
           <span class="text nav-text">Logout</span>
         </a>
       </li>
-      <li class="mode">
+      <!-- <li class="mode">
         <div class="sun-moon">
           <i class="bx bx-moon icon moon"></i>
           <i class="bx bx-sun icon sun"></i>
@@ -67,7 +90,7 @@
         <div class="toggle-switch">
           <span class="switch"></span>
         </div>
-      </li>
+      </li> -->
     </div>
   </div>
 </nav>
@@ -75,12 +98,12 @@
 <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 <script>
   // Single, clean sidebar toggle script
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.querySelector('.sidebar');
     const toggle = document.querySelector('.toggle');
-    
+
     if (toggle && sidebar) {
-      toggle.addEventListener('click', function() {
+      toggle.addEventListener('click', function () {
         sidebar.classList.toggle('close');
         document.body.classList.toggle('sidebar-closed');
         console.log('Sidebar toggled - close:', sidebar.classList.contains('close'));
@@ -89,8 +112,8 @@
 
     // Keep your existing dark mode functionality
     const body = document.querySelector("body"),
-          modeSwitch = body.querySelector(".toggle-switch"),
-          modeText = body.querySelector(".mode-text");
+      modeSwitch = body.querySelector(".toggle-switch"),
+      modeText = body.querySelector(".mode-text");
 
     if (modeSwitch) {
       modeSwitch.addEventListener("click", () => {
