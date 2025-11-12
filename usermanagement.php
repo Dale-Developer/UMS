@@ -7,9 +7,159 @@
   <link rel="stylesheet" href="styles/usermanagement.css" />
   <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet" />
   <title>User Management</title>
+  <style>
+    /* Popup/Message Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-modal-container {
+      background: white;
+      border-radius: 8px;
+      padding: 0;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    .popup-modal-content {
+      padding: 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .popup-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-icon.success {
+      color: #28a745;
+    }
+
+    .popup-icon.error {
+      color: #dc3545;
+    }
+
+    .popup-icon.warning {
+      color: #ffc107;
+    }
+
+    .popup-text {
+      text-align: center;
+    }
+
+    .popup-text h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .popup-text p {
+      margin: 0;
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .popup-actions {
+      padding: 1rem 2rem;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Animation for modal */
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Hide animation for smooth close */
+    .popup-modal-container.hide {
+      animation: modalSlideOut 0.3s ease forwards;
+    }
+
+    @keyframes modalSlideOut {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+      }
+    }
+
+    /* Button styles for popup */
+    .popup-actions .btn {
+      min-width: 100px;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #5a6268;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Popup Messages -->
+
   <!-- SIDEBAR -->
   <?php include 'sidebar.php'; ?>
   <!-- Page Header -->
@@ -53,7 +203,7 @@
         <tbody>
           <?php
           include 'db_connect.php';
-
+      
           $sql = "SELECT * FROM users ORDER BY id ASC";
           $result = $conn->query($sql);
 
@@ -254,6 +404,44 @@
       </div> -->
     </div>
   </div>
+
+  <!-- Success/Error Modal -->
+  <div class="modal-overlay" id="messageModalOverlay" style="display: none;">
+    <div class="popup-modal-container">
+      <div class="popup-modal-content">
+        <div class="popup-icon success" id="popupIcon">
+          <i class='bx bx-check-circle'></i>
+        </div>
+        <div class="popup-text">
+          <h3 class="popup-title" id="popupTitle">Success!</h3>
+          <p class="popup-message" id="popupMessage">User added successfully!</p>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-primary" id="messageModalOkBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteConfirmModalOverlay" style="display: none;">
+    <div class="popup-modal-container">
+      <div class="popup-modal-content">
+        <div class="popup-icon warning" id="deleteConfirmIcon">
+          <i class='bx bx-error-circle'></i>
+        </div>
+        <div class="popup-text">
+          <h3 class="popup-title" id="deleteConfirmTitle">Confirm Delete</h3>
+          <p class="popup-message" id="deleteConfirmMessage">Are you sure you want to delete this user? This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" id="deleteConfirmCancelBtn">Cancel</button>
+        <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Modal elements
@@ -270,12 +458,31 @@
       const viewModalClose = document.getElementById('viewModalClose');
       const viewFormCancel = document.getElementById('viewFormCancel');
 
+      // Message Modal elements
+      const messageModalOverlay = document.getElementById('messageModalOverlay');
+      const messageModalOkBtn = document.getElementById('messageModalOkBtn');
+      const popupIcon = document.getElementById('popupIcon');
+      const popupTitle = document.getElementById('popupTitle');
+      const popupMessage = document.getElementById('popupMessage');
+
+      // Delete Confirmation Modal elements
+      const deleteConfirmModalOverlay = document.getElementById('deleteConfirmModalOverlay');
+      const deleteConfirmCancelBtn = document.getElementById('deleteConfirmCancelBtn');
+      const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+      const deleteConfirmIcon = document.getElementById('deleteConfirmIcon');
+      const deleteConfirmTitle = document.getElementById('deleteConfirmTitle');
+      const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+
+      // Variables to track deletion
+      let currentDeleteUserId = null;
+
       // open/close helpers
       function openModal(modal) {
         if (!modal) return;
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       }
+
       function closeModal(modal) {
         if (!modal) return;
         modal.style.display = 'none';
@@ -320,19 +527,81 @@
         this.innerHTML = type === 'password' ? '<i class="bx bx-hide"></i>' : '<i class="bx bx-show"></i>';
       });
 
-      // Delete buttons
+      // ---------- DELETE CONFIRMATION FUNCTIONALITY ----------
+      function showDeleteConfirmation(userId, userName) {
+        currentDeleteUserId = userId;
+        
+        // Set the confirmation message with user info if available
+        if (userName) {
+          deleteConfirmMessage.textContent = `Are you sure you want to delete user "${userName}"? This action cannot be undone.`;
+        } else {
+          deleteConfirmMessage.textContent = 'Are you sure you want to delete this user? This action cannot be undone.';
+        }
+        
+        openModal(deleteConfirmModalOverlay);
+      }
+
+      function performDelete() {
+        if (!currentDeleteUserId) return;
+
+        fetch(`delete_user.php?id=${encodeURIComponent(currentDeleteUserId)}`)
+          .then(r => r.text())
+          .then(() => {
+            // Close delete confirmation modal
+            closeModal(deleteConfirmModalOverlay);
+            
+            // Show success message
+            showMessageModal('success', 'User deleted successfully!');
+            
+            // Reload the page after a short delay to show the message
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('delete_user.php error:', err);
+            closeModal(deleteConfirmModalOverlay);
+            showMessageModal('error', 'Failed to delete user. Please try again.');
+          });
+      }
+
+      // Delete confirmation modal event listeners
+      deleteConfirmCancelBtn?.addEventListener('click', () => {
+        closeModal(deleteConfirmModalOverlay);
+        currentDeleteUserId = null;
+      });
+
+      deleteConfirmBtn?.addEventListener('click', performDelete);
+
+      // Close delete confirmation modal when clicking outside
+      if (deleteConfirmModalOverlay) {
+        deleteConfirmModalOverlay.addEventListener('click', (e) => {
+          if (e.target === deleteConfirmModalOverlay) {
+            closeModal(deleteConfirmModalOverlay);
+            currentDeleteUserId = null;
+          }
+        });
+      }
+
+      // Close delete confirmation modal with Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && deleteConfirmModalOverlay && deleteConfirmModalOverlay.style.display === 'flex') {
+          closeModal(deleteConfirmModalOverlay);
+          currentDeleteUserId = null;
+        }
+      });
+
+      // Delete buttons - updated to use confirmation modal
       document.querySelectorAll('.btn-icon.delete').forEach(btn => {
         btn.addEventListener('click', function () {
-          const uid = this.getAttribute('data-user-id') || this.dataset.userId;
-          if (!uid) return;
-          if (!confirm('Are you sure you want to delete this user?')) return;
-          fetch(`delete_user.php?id=${encodeURIComponent(uid)}`)
-            .then(r => r.text())
-            .then(() => location.reload())
-            .catch(err => {
-              console.error('delete_user.php error:', err);
-              alert('Failed to delete user. See console.');
-            });
+          const userId = this.getAttribute('data-user-id') || this.dataset.userId;
+          if (!userId) return;
+
+          // Get user name for confirmation message (optional)
+          const userName = this.closest('tr').querySelector('td:nth-child(3)').textContent + ' ' + 
+                          this.closest('tr').querySelector('td:nth-child(4)').textContent;
+          
+          showDeleteConfirmation(userId, userName.trim());
         });
       });
 
@@ -440,21 +709,104 @@
             method: 'POST',
             body: formData
           })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                alert('User updated successfully!');
-                closeModal(editModalOverlay);
-                location.reload();
-              } else {
-                alert('Error: ' + (data.error || 'Failed to update user'));
-              }
+            .then(response => response.text())
+            .then(() => {
+              // Close the edit modal first
+              closeModal(editModalOverlay);
+              
+              // Show success message
+              showMessageModal('success', 'User updated successfully!');
+              
+              // Reload the page after a short delay to show the message
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
             })
             .catch(error => {
               console.error('Error updating user:', error);
-              alert('Failed to update user.');
+              showMessageModal('error', 'Failed to update user. Please try again.');
             });
         });
+      }
+
+      // ---------- MESSAGE MODAL FUNCTIONALITY ----------
+      function showMessageModal(type, message) {
+        if (!messageModalOverlay) return;
+
+        // Set modal content based on type
+        if (type === 'success') {
+          popupIcon.className = 'popup-icon success';
+          popupIcon.innerHTML = '<i class="bx bx-check-circle"></i>';
+          popupTitle.textContent = 'Success!';
+        } else {
+          popupIcon.className = 'popup-icon error';
+          popupIcon.innerHTML = '<i class="bx bx-error-circle"></i>';
+          popupTitle.textContent = 'Error';
+        }
+
+        popupMessage.textContent = message;
+        messageModalOverlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Remove hide class if it exists
+        const modalContainer = messageModalOverlay.querySelector('.popup-modal-container');
+        modalContainer.classList.remove('hide');
+      }
+
+      function closeMessageModal() {
+        if (!messageModalOverlay) return;
+
+        const modalContainer = messageModalOverlay.querySelector('.popup-modal-container');
+        modalContainer.classList.add('hide');
+
+        setTimeout(() => {
+          messageModalOverlay.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          // Clear URL parameters without reloading
+          const url = new URL(window.location);
+          url.searchParams.delete('popup');
+          url.searchParams.delete('message');
+          window.history.replaceState({}, '', url);
+        }, 300);
+      }
+
+      // Close message modal when OK button is clicked
+      if (messageModalOkBtn) {
+        messageModalOkBtn.addEventListener('click', closeMessageModal);
+      }
+
+      // Close message modal when clicking outside
+      if (messageModalOverlay) {
+        messageModalOverlay.addEventListener('click', function (e) {
+          if (e.target === messageModalOverlay) {
+            closeMessageModal();
+          }
+        });
+      }
+
+      // Close message modal with Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && messageModalOverlay && messageModalOverlay.style.display === 'flex') {
+          closeMessageModal();
+        }
+      });
+
+      // Auto-close message modal after 3 seconds
+      if (messageModalOverlay && messageModalOverlay.style.display === 'flex') {
+        setTimeout(() => {
+          closeMessageModal();
+        }, 3000);
+      }
+
+      // ---------- CHECK FOR URL PARAMETERS ON PAGE LOAD ----------
+      const urlParams = new URLSearchParams(window.location.search);
+      const popupType = urlParams.get('popup');
+      const message = urlParams.get('message');
+
+      if (popupType && message) {
+        // Decode the URL-encoded message
+        const decodedMessage = decodeURIComponent(message);
+        showMessageModal(popupType, decodedMessage);
       }
 
     }); // end DOMContentLoaded

@@ -31,7 +31,8 @@ $user_role = ucfirst($user['user_role'] ?? 'User'); // Capitalize role
   <header>
     <div class="image-text">
       <span class="image">
-        <box-icon name='user-account' type='solid' ></box-icon>
+        <box-icon name='user-pin' type='solid' ></box-icon>
+        <!-- <box-icon name='user-account' type='solid' ></box-icon> -->
       </span>
       <div class="text logo-text">
         <span class="name"><?= htmlspecialchars($username) ?></span>
@@ -60,18 +61,18 @@ $user_role = ucfirst($user['user_role'] ?? 'User'); // Capitalize role
             <span class="text nav-text">User Management</span>
           </a>
         </li>
-        <li class="nav-link">
-          <a href="records.php">
+        <!-- <li class="nav-link">
+          <a href="#">
             <i class='bx bx-folder-open icon'></i>
             <span class="text nav-text">Records</span>
           </a>
         </li>
         <li class="nav-link">
-          <a href="settings.php">
+          <a href="#">
             <i class='bx bx-cog icon'></i>
             <span class="text nav-text">Settings</span>
           </a>
-        </li>
+        </li> -->
       </ul>
     </div>
     <div class="bottom-content">

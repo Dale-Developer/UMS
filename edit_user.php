@@ -1,37 +1,50 @@
 <?php
 include 'db_connect.php';
 
-header('Content-Type: application/json');
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $user_id = trim($_POST['userId']);
+    $fullname = trim($_POST['fullName']);
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $user_role = trim($_POST['userRole']);
+    $password = trim($_POST['password']);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = intval($_POST['userId']);
-    $fullname = $_POST['fullName'];
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $user_role = $_POST['userRole'];
-    
-    // Check if password is provided
-    if (!empty($_POST['password'])) {
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET fullname = ?, email = ?, username = ?, user_role = ?, password = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssi", $fullname, $email, $username, $user_role, $password, $user_id);
-    } else {
-        $sql = "UPDATE users SET fullname = ?, email = ?, username = ?, user_role = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssi", $fullname, $email, $username, $user_role, $user_id);
+    // Validate inputs
+    if (empty($fullname) || empty($username) || empty($email) || empty($user_role)) {
+        header("Location: usermanagement.php?popup=error&message=" . urlencode("All fields are required!"));
+        exit();
     }
-    
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+
+    // Check if email or username already exists (excluding current user)
+    $check = $conn->prepare("SELECT * FROM users WHERE (email = ? OR username = ?) AND id != ?");
+    $check->bind_param("ssi", $email, $username, $user_id);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows > 0) {
+        header("Location: usermanagement.php?popup=error&message=" . urlencode("Email or username already exists!"));
+        exit();
+    }
+
+    // Update user information
+    if (!empty($password)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET fullname = ?, username = ?, email = ?, password = ?, user_role = ? WHERE id = ?");
+        $stmt->bind_param("sssssi", $fullname, $username, $email, $hashed_password, $user_role, $user_id);
     } else {
-        echo json_encode(['success' => false, 'error' => $conn->error]);
+        $stmt = $conn->prepare("UPDATE users SET fullname = ?, username = ?, email = ?, user_role = ? WHERE id = ?");
+        $stmt->bind_param("ssssi", $fullname, $username, $email, $user_role, $user_id);
+    }
+
+    if ($stmt->execute()) {
+        header("Location: usermanagement.php?popup=success&message=" . urlencode("User updated successfully!"));
+    } else {
+        header("Location: usermanagement.php?popup=error&message=" . urlencode("Failed to update user. Please try again."));
     }
     
     $stmt->close();
-} else {
-    echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+    $check->close();
+    $conn->close();
+    exit();
 }
-
-$conn->close();
 ?>

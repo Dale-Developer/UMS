@@ -8,6 +8,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
     $user_role = trim($_POST['userRole']);
 
+    // Validate inputs
+    if (empty($fullname) || empty($username) || empty($email) || empty($_POST['password']) || empty($user_role)) {
+        header("Location: usermanagement.php?popup=error&message=" . urlencode("All fields are required!"));
+        exit();
+    }
+
     // Check if email or username already exists
     $check = $conn->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
     $check->bind_param("ss", $email, $username);
@@ -15,8 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $check->get_result();
 
     if ($result->num_rows > 0) {
-        // Redirect with error popup - user already exists
-        header("Location: usermanagement.php?popup=exists");
+        header("Location: usermanagement.php?popup=error&message=" . urlencode("Email or username already exists!"));
         exit();
     } else {
         // Insert new user
@@ -25,17 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssss", $fullname, $username, $email, $password, $user_role);
 
         if ($stmt->execute()) {
-            // Redirect with success popup - user added to table
-            header("Location: usermanagement.php?popup=success");
-            exit();
+            header("Location: usermanagement.php?popup=success&message=" . urlencode("User added successfully!"));
         } else {
-            // Redirect with error popup - database error
-            header("Location: usermanagement.php?popup=error");
-            exit();
+            header("Location: usermanagement.php?popup=error&message=" . urlencode("Failed to add user. Please try again."));
         }
+        $stmt->close();
     }
 
-    $stmt->close();
+    $check->close();
     $conn->close();
+    exit();
 }
 ?>
