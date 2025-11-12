@@ -4,11 +4,11 @@ include 'db_connect.php';
 $showPopup = false;
 
 if (isset($_POST['login'])) {
-  $email = trim($_POST['email']);
+  $email = trim($_POST['username']);
   $password = trim($_POST['password']);
 
   // Secure query (fetch user by email)
-  $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+  $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
   $stmt->bind_param("s", $email);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -67,7 +67,7 @@ if (isset($_POST['login'])) {
     <div class="form-container sign-in-container">
       <form action="login.php" method="POST">
         <h1>Sign in</h1>
-        <input type="email" placeholder="Email" name="email" required />
+        <input type="text" placeholder="Username" name="username" required />
         <input type="password" placeholder="Password" name="password" required />
         <a href="#">Forgot your password?</a>
         <button type="submit" name="login">Sign In</button>

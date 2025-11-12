@@ -168,17 +168,17 @@
 
         <div class="form-group">
           <label for="editFullName">Full Name *</label>
-          <input type="text" id="editFullName" name="fullName" required placeholder="Enter full name">
+          <input type="text" id="editFullName" name="fullName" placeholder="Enter full name">
         </div>
 
         <div class="form-group">
           <label for="editEmail">Email Address *</label>
-          <input type="email" id="editEmail" name="email" required placeholder="Enter email address">
+          <input type="email" id="editEmail" name="email" placeholder="Enter email address">
         </div>
 
         <div class="form-group">
           <label for="editUsername">Username *</label>
-          <input type="text" id="editUsername" name="username" required placeholder="Enter username">
+          <input type="text" id="editUsername" name="username" placeholder="Enter username">
         </div>
 
         <div class="form-group">
@@ -194,19 +194,13 @@
         <div class="form-group">
           <label for="editUserRole">User Role *</label>
           <select id="editUserRole" name="userRole" required>
+            <option value="">Select a role</option>
             <option value="admin">Admin</option>
             <option value="staff">Staff</option>
             <option value="user">Regular User</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label for="editStatus">Status *</label>
-          <select id="editStatus" name="status" required>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-cancel" id="editFormCancel">Cancel</button>
@@ -247,26 +241,19 @@
           <label>Role:</label>
           <span id="viewRole" class="role-badge">-</span>
         </div>
-        <div class="detail-group">
-          <label>Status:</label>
-          <span id="viewStatus" class="status-badge">-</span>
-        </div>
+
         <div class="detail-group">
           <label>Created Date:</label>
           <span id="viewCreatedDate">-</span>
         </div>
-        <div class="detail-group">
-          <label>Last Login:</label>
-          <span id="viewLastLogin">-</span>
-        </div>
-      </div>
 
+      </div>
+      <!-- 
       <div class="form-actions">
         <button type="button" class="btn btn-cancel" id="viewFormCancel">Close</button>
-      </div>
+      </div> -->
     </div>
   </div>
-
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Modal elements
@@ -283,217 +270,196 @@
       const viewModalClose = document.getElementById('viewModalClose');
       const viewFormCancel = document.getElementById('viewFormCancel');
 
-      // Password toggles
-      const togglePassword = document.getElementById('togglePassword');
-      const passwordInput = document.getElementById('password');
-      const editTogglePassword = document.getElementById('editTogglePassword');
-      const editPasswordInput = document.getElementById('editPassword');
-
-      // Delete mode elements
-      const deleteBtn = document.getElementById('deleteBtn');
-      const cancelDeleteBtn = document.getElementById('cancelDelete');
-      const selectAllCheckbox = document.getElementById('selectAll');
-      let isDeleteMode = false;
-
-      // Open modals
-      addUserBtn.addEventListener('click', function () {
-        openModal(addModalOverlay);
-      });
-
-      // Edit buttons
-      const editButtons = document.querySelectorAll('.btn-icon.edit');
-      editButtons.forEach(button => {
-        button.addEventListener('click', function () {
-          const userId = this.getAttribute('data-user-id');
-          loadUserData(userId);
-          openModal(editModalOverlay);
-        });
-      });
-
-      // View buttons
-      const viewButtons = document.querySelectorAll('.btn-icon.view');
-      viewButtons.forEach(button => {
-        button.addEventListener('click', function () {
-          const userId = this.getAttribute('data-user-id');
-          loadUserDetails(userId);
-          openModal(viewModalOverlay);
-        });
-      });
-
-      // Close modals
+      // open/close helpers
+      function openModal(modal) {
+        if (!modal) return;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
       function closeModal(modal) {
+        if (!modal) return;
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
       }
 
-      function openModal(modal) {
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-      }
+      // basic modal wiring
+      addUserBtn?.addEventListener('click', () => openModal(addModalOverlay));
+      addModalClose?.addEventListener('click', () => closeModal(addModalOverlay));
+      addFormCancel?.addEventListener('click', () => closeModal(addModalOverlay));
 
-      // Modal close events
-      addModalClose.addEventListener('click', () => closeModal(addModalOverlay));
-      addFormCancel.addEventListener('click', () => closeModal(addModalOverlay));
+      editModalClose?.addEventListener('click', () => closeModal(editModalOverlay));
+      editFormCancel?.addEventListener('click', () => closeModal(editModalOverlay));
 
-      editModalClose.addEventListener('click', () => closeModal(editModalOverlay));
-      editFormCancel.addEventListener('click', () => closeModal(editModalOverlay));
+      viewModalClose?.addEventListener('click', () => closeModal(viewModalOverlay));
+      viewFormCancel?.addEventListener('click', () => closeModal(viewModalOverlay));
 
-      viewModalClose.addEventListener('click', () => closeModal(viewModalOverlay));
-      viewFormCancel.addEventListener('click', () => closeModal(viewModalOverlay));
-
-      // Close modals when clicking outside
       [addModalOverlay, editModalOverlay, viewModalOverlay].forEach(modal => {
-        modal.addEventListener('click', function (e) {
-          if (e.target === modal) {
-            closeModal(modal);
-          }
+        if (!modal) return;
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(modal);
         });
       });
 
-      // Toggle password visibility
-      togglePassword.addEventListener('click', function () {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
+      // Toggle password (add modal)
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      togglePassword?.addEventListener('click', function () {
+        if (!passwordInput) return;
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
         this.innerHTML = type === 'password' ? '<i class="bx bx-hide"></i>' : '<i class="bx bx-show"></i>';
       });
 
-      editTogglePassword.addEventListener('click', function () {
-        const type = editPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        editPasswordInput.setAttribute('type', type);
+      // Toggle password (edit modal)
+      const editTogglePassword = document.getElementById('editTogglePassword');
+      const editPasswordInput = document.getElementById('editPassword');
+      editTogglePassword?.addEventListener('click', function () {
+        if (!editPasswordInput) return;
+        const type = editPasswordInput.type === 'password' ? 'text' : 'password';
+        editPasswordInput.type = type;
         this.innerHTML = type === 'password' ? '<i class="bx bx-hide"></i>' : '<i class="bx bx-show"></i>';
       });
 
-      // Load user data for editing (mock data - replace with actual API call)
-      function loadUserData(userId) {
-        // Mock user data - replace with actual data from your backend
-        const userData = {
-          '1': {
-            fullName: 'Mark Otto',
-            email: 'mark.otto@email.com',
-            username: '@mdo',
-            role: 'admin',
-            status: 'active'
-          },
-          '2': {
-            fullName: 'Jacob Thornton',
-            email: 'jacob.thornton@email.com',
-            username: '@fat',
-            role: 'user',
-            status: 'active'
-          },
-          '3': {
-            fullName: 'John Doe',
-            email: 'john.doe@email.com',
-            username: '@johnd',
-            role: 'staff',
-            status: 'active'
-          }
-        };
+      // Delete buttons
+      document.querySelectorAll('.btn-icon.delete').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const uid = this.getAttribute('data-user-id') || this.dataset.userId;
+          if (!uid) return;
+          if (!confirm('Are you sure you want to delete this user?')) return;
+          fetch(`delete_user.php?id=${encodeURIComponent(uid)}`)
+            .then(r => r.text())
+            .then(() => location.reload())
+            .catch(err => {
+              console.error('delete_user.php error:', err);
+              alert('Failed to delete user. See console.');
+            });
+        });
+      });
 
-        const user = userData[userId];
-        if (user) {
-          document.getElementById('editUserId').value = userId;
-          document.getElementById('editFullName').value = user.fullName;
-          document.getElementById('editEmail').value = user.email;
-          document.getElementById('editUsername').value = user.username;
-          document.getElementById('editUserRole').value = user.role;
-          document.getElementById('editStatus').value = user.status;
-        }
-      }
-
-      // Load user details for viewing (mock data - replace with actual API call)
+      // ---------- LOAD USER DETAILS FOR VIEW ----------
       function loadUserDetails(userId) {
-        // Mock user details - replace with actual data from your backend
-        const userDetails = {
-          '1': {
-            fullName: 'Mark Otto',
-            email: 'mark.otto@email.com',
-            username: '@mdo',
-            role: 'admin',
-            status: 'active',
-            createdDate: '2024-01-15',
-            lastLogin: '2024-03-20 14:30'
-          },
-          '2': {
-            fullName: 'Jacob Thornton',
-            email: 'jacob.thornton@email.com',
-            username: '@fat',
-            role: 'user',
-            status: 'active',
-            createdDate: '2024-02-10',
-            lastLogin: '2024-03-19 09:15'
-          },
-          '3': {
-            fullName: 'John Doe',
-            email: 'john.doe@email.com',
-            username: '@johnd',
-            role: 'staff',
-            status: 'active',
-            createdDate: '2024-01-20',
-            lastLogin: '2024-03-18 16:45'
-          }
-        };
+        fetch(`get_user.php?id=${userId}`)
+          .then(response => response.json())
+          .then(user => {
+            if (user.error) {
+              alert('Error: ' + user.error);
+              return;
+            }
 
-        const user = userDetails[userId];
-        if (user) {
-          document.getElementById('viewUserId').textContent = userId;
-          document.getElementById('viewFullName').textContent = user.fullName;
-          document.getElementById('viewEmail').textContent = user.email;
-          document.getElementById('viewUsername').textContent = user.username;
-          document.getElementById('viewRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-          document.getElementById('viewRole').className = `role-badge ${user.role}`;
-          document.getElementById('viewStatus').textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1);
-          document.getElementById('viewStatus').className = `status-badge ${user.status}`;
-          document.getElementById('viewCreatedDate').textContent = user.createdDate;
-          document.getElementById('viewLastLogin').textContent = user.lastLogin;
-        }
+            // Populate view modal with user data
+            document.getElementById('viewUserId').textContent = user.id || '-';
+            document.getElementById('viewFullName').textContent = user.fullname || '-';
+            document.getElementById('viewEmail').textContent = user.email || '-';
+            document.getElementById('viewUsername').textContent = user.username || '-';
+
+            // Role with styling
+            const viewRole = document.getElementById('viewRole');
+            viewRole.textContent = user.user_role || '-';
+            viewRole.className = `role-badge ${user.user_role || ''}`;
+
+            // Status with styling (if you have status field)
+            if (document.getElementById('viewStatus')) {
+              const viewStatus = document.getElementById('viewStatus');
+              viewStatus.textContent = user.status || 'active';
+              viewStatus.className = `status-badge ${user.status || 'active'}`;
+            }
+
+            document.getElementById('viewCreatedDate').textContent = user.date_created || '-';
+
+            // If you have last_login field in your database
+            if (document.getElementById('viewLastLogin')) {
+              document.getElementById('viewLastLogin').textContent = user.last_login || '-';
+            }
+
+            openModal(viewModalOverlay);
+          })
+          .catch(error => {
+            console.error('Error loading user details:', error);
+            alert('Failed to load user details.');
+          });
       }
 
-      // Delete mode functionality
-      deleteBtn.addEventListener('click', function () {
-        isDeleteMode = !isDeleteMode;
-        toggleDeleteMode(isDeleteMode);
-      });
+      // ---------- LOAD USER DATA FOR EDIT ----------
+      function loadUserForEdit(userId) {
+        fetch(`get_user.php?id=${userId}`)
+          .then(response => response.json())
+          .then(user => {
+            if (user.error) {
+              alert('Error: ' + user.error);
+              return;
+            }
 
-      cancelDeleteBtn.addEventListener('click', function () {
-        isDeleteMode = false;
-        toggleDeleteMode(false);
-        resetCheckboxes();
-      });
+            // Populate edit form with user data
+            document.getElementById('editUserId').value = user.id || '';
+            document.getElementById('editFullName').value = user.fullname || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editUsername').value = user.username || '';
 
-      selectAllCheckbox.addEventListener('change', function () {
-        const userCheckboxes = document.querySelectorAll('.select-user');
-        userCheckboxes.forEach(checkbox => {
-          checkbox.checked = selectAllCheckbox.checked;
+            // Set the user role
+            const editUserRole = document.getElementById('editUserRole');
+            if (editUserRole) {
+              editUserRole.value = user.user_role || 'user';
+            }
+
+            // Clear password field for safety
+            document.getElementById('editPassword').value = '';
+
+            openModal(editModalOverlay);
+          })
+          .catch(error => {
+            console.error('Error loading user for edit:', error);
+            alert('Failed to load user data for editing.');
+          });
+      }
+
+      // ---------- ATTACH VIEW BUTTON LISTENERS ----------
+      document.querySelectorAll('.btn-icon.view').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = this.getAttribute('data-user-id');
+          loadUserDetails(userId);
         });
       });
 
-      function toggleDeleteMode(enable) {
-        const checkboxColumns = document.querySelectorAll('.checkbox-column');
-        const actionButtons = document.querySelectorAll('.actions');
+      // ---------- ATTACH EDIT BUTTON LISTENERS ----------
+      document.querySelectorAll('.btn-icon.edit').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = this.getAttribute('data-user-id');
+          loadUserForEdit(userId);
+        });
+      });
 
-        if (enable) {
-          checkboxColumns.forEach(col => col.style.display = 'table-cell');
-          actionButtons.forEach(btn => btn.style.display = 'none');
-          deleteBtn.style.display = 'none';
-          cancelDeleteBtn.style.display = 'flex';
-        } else {
-          checkboxColumns.forEach(col => col.style.display = 'none');
-          actionButtons.forEach(btn => btn.style.display = 'flex');
-          deleteBtn.style.display = 'flex';
-          cancelDeleteBtn.style.display = 'none';
-        }
-      }
+      // ---------- EDIT FORM SUBMISSION ----------
+      const editUserForm = document.getElementById('editUserForm');
+      if (editUserForm) {
+        editUserForm.addEventListener('submit', function (e) {
+          e.preventDefault();
 
-      function resetCheckboxes() {
-        selectAllCheckbox.checked = false;
-        const userCheckboxes = document.querySelectorAll('.select-user');
-        userCheckboxes.forEach(checkbox => {
-          checkbox.checked = false;
+          const formData = new FormData(this);
+
+          fetch('edit_user.php', {
+            method: 'POST',
+            body: formData
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                alert('User updated successfully!');
+                closeModal(editModalOverlay);
+                location.reload();
+              } else {
+                alert('Error: ' + (data.error || 'Failed to update user'));
+              }
+            })
+            .catch(error => {
+              console.error('Error updating user:', error);
+              alert('Failed to update user.');
+            });
         });
       }
-    });
+
+    }); // end DOMContentLoaded
   </script>
+
 </body>
 
 </html>

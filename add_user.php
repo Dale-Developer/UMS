@@ -2,25 +2,40 @@
 include 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $fullname = $_POST['fullName'];
-  $email = $_POST['email'];
-  $username = $_POST['username'];
-  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-  $userRole = $_POST['userRole'];
+    $fullname = trim($_POST['fullName']);
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
+    $user_role = trim($_POST['userRole']);
 
-  $sql = "INSERT INTO users (fullname, email, username, password, user_role, status, created_at)
-          VALUES (?, ?, ?, ?, ?, 'active', NOW())";
+    // Check if email or username already exists
+    $check = $conn->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
+    $check->bind_param("ss", $email, $username);
+    $check->execute();
+    $result = $check->get_result();
 
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("sssss", $fullname, $email, $username, $password, $userRole);
+    if ($result->num_rows > 0) {
+        // Redirect with error popup - user already exists
+        header("Location: usermanagement.php?popup=exists");
+        exit();
+    } else {
+        // Insert new user
+        $stmt = $conn->prepare("INSERT INTO users (fullname, username, email, password, user_role, date_created) 
+                                VALUES (?, ?, ?, ?, ?, NOW())");
+        $stmt->bind_param("sssss", $fullname, $username, $email, $password, $user_role);
 
-  if ($stmt->execute()) {
-    echo "<script>alert('User added successfully!'); window.location.href='usermanagement.php';</script>";
-  } else {
-    echo "<script>alert('Error adding user: " . $conn->error . "'); window.history.back();</script>";
-  }
+        if ($stmt->execute()) {
+            // Redirect with success popup - user added to table
+            header("Location: usermanagement.php?popup=success");
+            exit();
+        } else {
+            // Redirect with error popup - database error
+            header("Location: usermanagement.php?popup=error");
+            exit();
+        }
+    }
 
-  $stmt->close();
-  $conn->close();
+    $stmt->close();
+    $conn->close();
 }
 ?>

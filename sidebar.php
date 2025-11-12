@@ -31,7 +31,7 @@ $user_role = ucfirst($user['user_role'] ?? 'User'); // Capitalize role
   <header>
     <div class="image-text">
       <span class="image">
-        <box-icon type="solid" name="package"></box-icon>
+        <box-icon name='user-account' type='solid' ></box-icon>
       </span>
       <div class="text logo-text">
         <span class="name"><?= htmlspecialchars($username) ?></span>

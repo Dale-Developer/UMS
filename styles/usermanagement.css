@@ -105,12 +105,12 @@ body {
 }
 
 .btn-cancel {
-  background: #6c757d;
+  background: #c82333;
   color: white;
 }
 
 .btn-cancel:hover {
-  background: #5a6268;
+  background: #c82333;
 }
 
 /* Table Container */
